@@ -34,9 +34,14 @@ exports.insert = async (req, res) => {
 };
 exports.update = async (req, res) => {
     try {
+        if (!req.body.title) {
+            return res.status(500).json({ error: 'category title is needed' });
+        }
+
         if (!req.params.id) {
             return res.status(500).json({ error: 'category id missing' });
         }
+        
         if (!mongoose.isValidObjectId(req.params.id)) {
             return res.status(500).json({ error: 'category id not valid' });
         }
