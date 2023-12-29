@@ -5,7 +5,7 @@ const newsSchema = new mongoose.Schema(
         description: { type: String, required: true },
         richDescription: { type: String, required: true },
         image: { type: String, required: true },
-        images: { type: String },
+        images: [{ type: String }],
         author: {
             type: mongoose.Types.ObjectId,
             ref: 'Author',

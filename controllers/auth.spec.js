@@ -7,10 +7,6 @@ jest.mock('../models/user');
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
 
-afterEach(() => {
-    jest.resetAllMocks();
-});
-
 describe('auth controller', () => {
     describe('register()', () => {
         it('should return an error if body is null', async () => {
