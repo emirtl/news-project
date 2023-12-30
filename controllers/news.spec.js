@@ -168,7 +168,7 @@ describe('news controller', () => {
             const req = { body: {}, params: {} };
             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
 
-            await update(req, res);
+            await remove(req, res);
             expect(res.status).toHaveBeenCalledWith(500);
             expect(res.json).toHaveBeenCalledWith({ error: 'news id missing' });
         });
@@ -177,7 +177,7 @@ describe('news controller', () => {
             const req = { body: {}, params: { id: 'not-valid' } };
             const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
 
-            await update(req, res);
+            await remove(req, res);
             expect(res.status).toHaveBeenCalledWith(500);
             expect(res.json).toHaveBeenCalledWith({
                 error: 'news id not valid',

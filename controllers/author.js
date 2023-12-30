@@ -15,8 +15,8 @@ exports.getAll = async (req, res) => {
 
 exports.insert = async (req, res) => {
     try {
-        if (!req.body.name) {
-            return res.status(500).json({ error: 'name is needed' });
+        if (!req.body.name || !req.body.position || !req.body.description) {
+            return res.status(500).json({ error: 'author body is needed' });
         }
         const author = await Author.create({
             name: req.body.name,
