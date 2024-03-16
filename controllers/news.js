@@ -1,8 +1,61 @@
 const News = require('../models/news');
 const mongoose = require('mongoose');
 exports.getAll = async (req, res) => {
+    let filter = {};
+    if (req.query.categories) {
+        filter = {
+            category: req.query.categories.split(','),
+        };
+    }
+    if (req.query.isFeatured) {
+        filter = {
+            isFeatured: true,
+        };
+    }
+    if (req.query.minNumViews || req.query.maxNumViews) {
+        const numViewsFilter = {};
+        if (req.query.minNumViews) {
+            numViewsFilter.$gte = parseInt(req.query.minNumViews);
+        }
+        if (req.query.maxNumViews) {
+            numViewsFilter.$lte = parseInt(req.query.maxNumViews);
+        }
+        filter.numReviews = numViewsFilter;
+    }
+
+    if (req.query.$search) {
+        const $searchText = req.query.$search.toLowerCase();
+        filter = {
+            $or: [
+                { title: { $regex: $searchText, $options: 'i' } },
+                { description: { $regex: $searchText, $options: 'i' } },
+            ],
+        };
+    }
     try {
-        const news = await News.find();
+        const news = await News.find(filter)
+            .populate('category')
+            .populate('author');
+        if (!news) {
+            return res.status(500).json({ error: 'fetching news failed' });
+        }
+        return res.status(200).json({ news });
+    } catch (e) {
+        return res.status(500).json({ error: 'fetching news failed', e });
+    }
+};
+
+exports.get = async (req, res) => {
+    if (!req.params.id) {
+        return res.status(500).json({ error: 'fetching news failed' });
+    }
+    try {
+        const news = await News.findById(req.params.id)
+            .populate('category')
+            .populate('author');
+        news.numReviews += 1;
+        news.save();
+        console.log(news);
         if (!news) {
             return res.status(500).json({ error: 'fetching news failed' });
         }
@@ -19,30 +72,48 @@ exports.insert = async (req, res) => {
             !req.body.description ||
             !req.body.richDescription ||
             !req.body.author ||
-            !req.body.category
+            !req.body.category ||
+            !req.files.coverImage ||
+            !req.files.image
         ) {
             return res.status(500).json({ error: 'news body is needed' });
         }
-        if (!req.file) {
-            return res.status(500).json({ error: 'image is needed' });
+
+        let coverImagePath;
+        let newImagePath;
+        if (req.files.image) {
+            req.files.image.map((file) => {
+                const imagePath = `${req.protocol}://${req.get(
+                    'host'
+                )}/public/uploads/${file.filename}`;
+                newImagePath = imagePath;
+            });
         }
 
-        const imagePath = `${req.protocol}://${req.get(
-            'host'
-        )}/public/uploads/${req.file.filename}`;
+        if (req.files.coverImage) {
+            req.files.coverImage.map((file) => {
+                const imagePath = `${req.protocol}://${req.get(
+                    'host'
+                )}/public/uploads/${file.filename}`;
+                coverImagePath = imagePath;
+            });
+        }
 
         const news = await News.create({
             title: req.body.title,
             description: req.body.description,
             richDescription: req.body.richDescription,
-            image: imagePath,
+            image: newImagePath,
+            coverImage: coverImagePath,
             author: req.body.author,
             category: req.body.category,
+            isFeatured: req.body.isFeatured,
+            isBreakingNews: req.body.isBreakingNews,
         });
-
         if (!news) {
             return res.status(500).json({ error: 'news creation failed' });
         }
+
         return res.status(201).json({ news });
     } catch (e) {
         return res.status(500).json({ error: 'news creation failed', e });
@@ -78,6 +149,8 @@ exports.update = async (req, res) => {
                 image: newFile,
                 author: req.body.author,
                 category: req.body.category,
+                isFeatured: req.body.isFeatured,
+                isBreakingNews: req.body.isBreakingNews,
             },
             { new: true }
         );

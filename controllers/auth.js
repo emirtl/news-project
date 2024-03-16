@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 exports.register = async (req, res) => {
     try {
@@ -64,6 +65,7 @@ exports.login = async (req, res) => {
 
         const payload = {
             id: existedUser._id,
+            username: existedUser.username,
             email: existedUser.email,
             admin: existedUser.admin,
             owner: existedUser.owner,
@@ -77,8 +79,50 @@ exports.login = async (req, res) => {
                 .status(401)
                 .json({ error: 'something went wrong. please try again' });
         }
-        return res.status(201).json({ token });
+        const user = {
+            ...payload,
+            token,
+        };
+        return res.status(201).json({ user });
     } catch (e) {
         return res.status(500).json({ error: 'loging user failed', e });
+    }
+};
+
+//users
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        if (!users) {
+            return res.status(500).json({ error: 'users not found' });
+        }
+        return res.status(200).json({ users });
+    } catch (e) {
+        return res.status(500).json({ error: 'fetching users failed', e });
+    }
+};
+
+exports.deleteUser = async (req, res) => {
+    console.log('hitted');
+    console.log(req.params.id);
+    if (!req.params.id) {
+        return res.status(500).json({ error: 'user id missing' });
+    }
+    if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(500).json({ error: 'user id not valid' });
+    }
+    try {
+        const deletedUser = await User.findOneAndDelete(req.params.id);
+        if (!deletedUser) {
+            return res
+                .status(500)
+                .json({ error: 'deleting user failed. please try later' });
+        }
+        return res.status(200).json({ message: 'user deleted' });
+    } catch (e) {
+        return res
+            .status(500)
+            .json({ error: 'deleting user failed. please try later', e });
     }
 };

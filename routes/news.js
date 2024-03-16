@@ -9,12 +9,17 @@ const MIME_TYPE = {
     'image/jpg': 'jpg',
     'image/png': 'png',
     'image/jpeg': 'jpg',
+    'image/gif': 'gif',
+    'video/mp4': 'mp4',
+    'video/quicktime': 'mov',
+    'video/webm': 'webm',
+    'video/x-flv': 'flv',
 };
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const isValid = MIME_TYPE[file.mimetype];
-        let error = new Error('file format is not an image');
+        let error = new Error('file format is not supported');
         if (isValid) {
             error = null;
         }
@@ -32,16 +37,21 @@ const storage = multer.diskStorage({
 
 router.get('/getAll', controller.getAll);
 
+router.get('/get/:id', controller.get);
+
 router.post(
     '/insert',
-    isAuthenticatedUser,
-    multer({ storage }).single('image'),
+    // isAuthenticatedUser,
+    multer({ storage }).fields([
+        { name: 'image', maxCount: 1 },
+        { name: 'coverImage', maxCount: 1 },
+    ]),
     controller.insert
 );
 
 router.put(
     '/update/:id',
-    isAuthenticatedUser,
+    // isAuthenticatedUser,
     multer({ storage }).single('image'),
     controller.update
 );

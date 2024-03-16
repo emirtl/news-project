@@ -13,7 +13,21 @@ exports.getAll = async (req, res) => {
     }
 };
 
+exports.getOne = async (req, res) => {
+    console.log('hitted');
+    try {
+        const author = await Author.findById(req.params.id);
+        if (!author) {
+            return res.status(500).json({ error: 'fetching author failed' });
+        }
+        return res.status(200).json({ author });
+    } catch (e) {
+        return res.status(500).json({ error: 'fetching author failed', e });
+    }
+};
+
 exports.insert = async (req, res) => {
+    console.log('hiited');
     try {
         if (!req.body.name || !req.body.position || !req.body.description) {
             return res.status(500).json({ error: 'author body is needed' });

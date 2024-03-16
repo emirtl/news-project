@@ -2,7 +2,7 @@ const Category = require('../models/category');
 const mongoose = require('mongoose');
 exports.getAll = async (req, res) => {
     try {
-        const categories = await Category.find();
+        const categories = await Category.find().sort({ createdAt: 1 });
 
         if (!categories) {
             return res
@@ -16,6 +16,7 @@ exports.getAll = async (req, res) => {
 };
 
 exports.insert = async (req, res) => {
+    console.log(req.body);
     try {
         if (!req.body.title) {
             return res.status(500).json({ error: 'category title is needed' });
@@ -27,7 +28,7 @@ exports.insert = async (req, res) => {
         if (!category) {
             return res.status(500).json({ error: 'category creation failed' });
         }
-        return res.status(201).json({ category });
+        return res.status(201).json(category);
     } catch (e) {
         return res.status(500).json({ error: 'category creation failed', e });
     }
@@ -41,7 +42,7 @@ exports.update = async (req, res) => {
         if (!req.params.id) {
             return res.status(500).json({ error: 'category id missing' });
         }
-        
+
         if (!mongoose.isValidObjectId(req.params.id)) {
             return res.status(500).json({ error: 'category id not valid' });
         }
