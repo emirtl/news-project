@@ -7,6 +7,18 @@ exports.getAll = async (req, res) => {
             category: req.query.categories.split(','),
         };
     }
+    if (req.query.isBreaking) {
+        filter = {
+            isBreakingNews: true,
+        };
+    }
+
+    if (req.query.isCatchingUp) {
+        filter = {
+            isCatchingUp: true,
+        };
+    }
+
     if (req.query.isFeatured) {
         filter = {
             isFeatured: true,
@@ -55,7 +67,6 @@ exports.get = async (req, res) => {
             .populate('author');
         news.numReviews += 1;
         news.save();
-        console.log(news);
         if (!news) {
             return res.status(500).json({ error: 'fetching news failed' });
         }
@@ -72,15 +83,14 @@ exports.insert = async (req, res) => {
             !req.body.description ||
             !req.body.richDescription ||
             !req.body.author ||
-            !req.body.category ||
-            !req.files.coverImage ||
-            !req.files.image
+            !req.body.category
         ) {
             return res.status(500).json({ error: 'news body is needed' });
         }
 
         let coverImagePath;
         let newImagePath;
+
         if (req.files.image) {
             req.files.image.map((file) => {
                 const imagePath = `${req.protocol}://${req.get(
@@ -128,16 +138,51 @@ exports.update = async (req, res) => {
             return res.status(500).json({ error: 'news id not valid' });
         }
 
-        const existedNews = News.findById(req.params.id);
-        let newFile;
+        const existedNews = await News.findById(req.params.id);
+        let coverImagePath;
+        let newImagePath;
 
-        if (!req.file) {
-            newFile = existedNews.image;
+        if (req.files.image) {
+            // if (
+            //     req.files.image.mimetype != 'video/mp4' ||
+            //     req.files.image.mimetype != 'video/quicktime' ||
+            //     req.files.image.mimetype != 'video/webm' ||
+            //     req.files.image.mimetype != 'video/x-flv'
+            // ) {
+            //     return res.status(500).json({
+            //         error: 'wrong file format. format is not a file',
+            //     });
+            // }
+            req.files.image.map((file) => {
+                const imagePath = `${req.protocol}://${req.get(
+                    'host'
+                )}/public/uploads/${file.filename}`;
+                newImagePath = imagePath;
+            });
         } else {
-            const imagePath = `${req.protocol}://${req.get(
-                'host'
-            )}/public/uploads/${req.file.filename}`;
-            newFile = imagePath;
+            newImagePath = existedNews.image;
+        }
+
+        if (req.files.coverImage) {
+            // if (
+            //     req.files.coverImage.mimetype != 'image/jpeg' ||
+            //     req.files.coverImage.mimetype != 'image/jpg' ||
+            //     req.files.coverImage.mimetype != 'image/png' ||
+            //     req.files.coverImage.mimetype != 'image/gif'
+            // ) {
+            //     return res.status(500).json({
+            //         error: 'wrong cover image format. format is not an image',
+            //     });
+            // }
+            console.log(req.files.coverImage);
+            req.files.coverImage.map((file) => {
+                const imagePath = `${req.protocol}://${req.get(
+                    'host'
+                )}/public/uploads/${file.filename}`;
+                coverImagePath = imagePath;
+            });
+        } else {
+            coverImagePath = existedNews.coverImagePath;
         }
 
         const updatedNews = await News.findByIdAndUpdate(
@@ -146,7 +191,8 @@ exports.update = async (req, res) => {
                 title: req.body.title,
                 description: req.body.description,
                 richDescription: req.body.richDescription,
-                image: newFile,
+                image: newImagePath,
+                coverImage: coverImagePath,
                 author: req.body.author,
                 category: req.body.category,
                 isFeatured: req.body.isFeatured,

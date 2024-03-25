@@ -4,8 +4,8 @@ const newsSchema = new mongoose.Schema(
         title: { type: String, required: true },
         description: { type: String, required: true },
         richDescription: { type: String, required: true },
-        image: { type: String, required: true },
-        coverImage: { type: String, required: true },
+        image: { type: String },
+        coverImage: { type: String },
         author: {
             type: mongoose.Types.ObjectId,
             ref: 'Author',
@@ -17,7 +17,8 @@ const newsSchema = new mongoose.Schema(
         },
 
         isFeatured: { type: Boolean, default: false },
-        isBreakingNews: { type: String, default: false },
+        isBreakingNews: { type: Boolean, default: false },
+        isCatchingUp: { type: Boolean, default: false },
         numReviews: { type: Number, default: 100 },
     },
     { timestamps: true }

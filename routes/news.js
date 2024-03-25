@@ -52,7 +52,10 @@ router.post(
 router.put(
     '/update/:id',
     // isAuthenticatedUser,
-    multer({ storage }).single('image'),
+    multer({ storage }).fields([
+        { name: 'image', maxCount: 1 },
+        { name: 'coverImage', maxCount: 1 },
+    ]),
     controller.update
 );
 
