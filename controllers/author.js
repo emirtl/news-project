@@ -14,7 +14,6 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getOne = async (req, res) => {
-    console.log('hitted');
     try {
         const author = await Author.findById(req.params.id);
         if (!author) {
@@ -27,16 +26,18 @@ exports.getOne = async (req, res) => {
 };
 
 exports.insert = async (req, res) => {
-    console.log('hiited');
     try {
         if (!req.body.name || !req.body.position || !req.body.description) {
             return res.status(500).json({ error: 'author body is needed' });
         }
-        const author = await Author.create({
+
+        let author = new Author({
             name: req.body.name,
             position: req.body.position,
             description: req.body.description,
         });
+
+        author = await author.save();
 
         if (!author) {
             return res.status(500).json({ error: 'author creation failed' });
@@ -91,7 +92,7 @@ exports.delete = async (req, res) => {
                 .status(500)
                 .json({ error: 'deleting author failed. please try later' });
         }
-        return res.status(200).json({ message: 'author deleted' });
+        return res.status(200).json({ deletedAuthor });
     } catch (e) {
         return res
             .status(500)

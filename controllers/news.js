@@ -1,6 +1,13 @@
 const News = require('../models/news');
 const mongoose = require('mongoose');
 exports.getAll = async (req, res) => {
+    let limit;
+    if (req.query.limit) {
+        limit = req.query.limit;
+    } else {
+        limit = 0;
+    }
+
     let filter = {};
     if (req.query.categories) {
         filter = {
@@ -46,6 +53,8 @@ exports.getAll = async (req, res) => {
     }
     try {
         const news = await News.find(filter)
+            .sort({ _id: -1 }) // Sort by _id in descending order (newest first)
+            .limit(limit)
             .populate('category')
             .populate('author');
         if (!news) {
@@ -109,7 +118,7 @@ exports.insert = async (req, res) => {
             });
         }
 
-        const news = await News.create({
+        let news = new News({
             title: req.body.title,
             description: req.body.description,
             richDescription: req.body.richDescription,
@@ -120,6 +129,8 @@ exports.insert = async (req, res) => {
             isFeatured: req.body.isFeatured,
             isBreakingNews: req.body.isBreakingNews,
         });
+        news = await news.save();
+
         if (!news) {
             return res.status(500).json({ error: 'news creation failed' });
         }
@@ -227,7 +238,7 @@ exports.delete = async (req, res) => {
                 .status(500)
                 .json({ error: 'deleting news failed. please try later' });
         }
-        return res.status(200).json({ message: 'news deleted' });
+        return res.status(200).json({ deletedNews });
     } catch (e) {
         return res
             .status(500)

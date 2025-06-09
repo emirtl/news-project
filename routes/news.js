@@ -3,7 +3,7 @@ const router = express.Router();
 const controller = require('../controllers/news');
 const multer = require('multer');
 const isAuthenticatedUser = require('../middlewares/isAuthenticated');
-// const isAuthenticatedUser = require("../middlewares/isAuth");
+const isAdmin = require('../middlewares/isAdmin');
 
 const MIME_TYPE = {
     'image/jpg': 'jpg',
@@ -41,7 +41,8 @@ router.get('/get/:id', controller.get);
 
 router.post(
     '/insert',
-    // isAuthenticatedUser,
+    isAuthenticatedUser,
+    isAdmin,
     multer({ storage }).fields([
         { name: 'image', maxCount: 1 },
         { name: 'coverImage', maxCount: 1 },
@@ -51,7 +52,7 @@ router.post(
 
 router.put(
     '/update/:id',
-    // isAuthenticatedUser,
+    isAuthenticatedUser,
     multer({ storage }).fields([
         { name: 'image', maxCount: 1 },
         { name: 'coverImage', maxCount: 1 },

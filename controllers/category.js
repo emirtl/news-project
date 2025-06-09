@@ -16,19 +16,21 @@ exports.getAll = async (req, res) => {
 };
 
 exports.insert = async (req, res) => {
-    console.log(req.body);
     try {
         if (!req.body.title) {
             return res.status(500).json({ error: 'category title is needed' });
         }
-        const category = await Category.create({
+
+        let category = new Category({
             title: req.body.title,
         });
+
+        category = await category.save();
 
         if (!category) {
             return res.status(500).json({ error: 'category creation failed' });
         }
-        return res.status(201).json(category);
+        return res.status(201).json({ category });
     } catch (e) {
         return res.status(500).json({ error: 'category creation failed', e });
     }
@@ -81,7 +83,7 @@ exports.delete = async (req, res) => {
                 .status(500)
                 .json({ error: 'deleting category failed. please try later' });
         }
-        return res.status(200).json({ message: 'category deleted' });
+        return res.status(200).json({ deletedCategory });
     } catch (e) {
         return res
             .status(500)
