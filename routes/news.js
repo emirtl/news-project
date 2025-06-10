@@ -53,6 +53,7 @@ router.post(
 router.put(
     '/update/:id',
     isAuthenticatedUser,
+    isAdmin,
     multer({ storage }).fields([
         { name: 'image', maxCount: 1 },
         { name: 'coverImage', maxCount: 1 },
