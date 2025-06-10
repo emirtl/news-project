@@ -25,6 +25,12 @@ app.use(`${process.env.API}/authors`, authorRoutes);
 app.use(`${process.env.API}/opinions`, opinionsRoutes);
 app.use(`${process.env.API}/liveUpdates`, liveUpdatesRoutes);
 
+const PORT = process.env.PORT || 9000;
+
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+});
+
 app.use((err, req, res, next) => {
     // Handle the error
     res.status(err.status || 500).json({ error: err.message });
