@@ -25,4 +25,9 @@ app.use(`${process.env.API}/authors`, authorRoutes);
 app.use(`${process.env.API}/opinions`, opinionsRoutes);
 app.use(`${process.env.API}/liveUpdates`, liveUpdatesRoutes);
 
+app.use((err, req, res, next) => {
+    // Handle the error
+    res.status(err.status || 500).json({ error: err.message });
+});
+
 module.exports = app;
