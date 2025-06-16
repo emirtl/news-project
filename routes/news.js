@@ -43,10 +43,7 @@ router.post(
     '/insert',
     isAuthenticatedUser,
     isAdmin,
-    multer({ storage }).fields([
-        { name: 'image', maxCount: 1 },
-        { name: 'coverImage', maxCount: 1 },
-    ]),
+    multer({ storage }).single('image'),
     controller.insert
 );
 
