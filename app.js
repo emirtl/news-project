@@ -15,10 +15,10 @@ var corsOptions = {
 };
 
 //middlewares
-
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/public/uploads', express.static(path.join('public/uploads')));
-app.use(cors(corsOptions));
+
 //routes
 
 const categoryRoutes = require('./routes/category');
