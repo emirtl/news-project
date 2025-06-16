@@ -4,6 +4,8 @@ require('dotenv').config();
 const path = require('path');
 const cors = require('cors');
 
+// cors
+
 var corsOptions = {
     origin: [
         'http://localhost:4200',
