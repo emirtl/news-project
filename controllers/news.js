@@ -100,13 +100,20 @@ exports.insert = async (req, res) => {
         let coverImagePath;
         let newImagePath;
 
-        if (req.files.image) {
-            req.files.image.map((file) => {
-                const imagePath = `${req.protocol}://${req.get(
-                    'host'
-                )}/public/uploads/${file.filename}`;
-                newImagePath = imagePath;
-            });
+        // if (req.files.image) {
+        //     req.files.image.map((file) => {
+        //         const imagePath = `${req.protocol}://${req.get(
+        //             'host'
+        //         )}/public/uploads/${file.filename}`;
+        //         newImagePath = imagePath;
+        //     });
+        // }
+
+        if (req.file.image) {
+            const imagePath = `${req.protocol}://${req.get(
+                'host'
+            )}/public/uploads/${req.file.filename}`;
+            newImagePath = imagePath;
         }
 
         if (req.files.coverImage) {
