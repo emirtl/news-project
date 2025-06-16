@@ -137,6 +137,7 @@ exports.insert = async (req, res) => {
             isBreakingNews: req.body.isBreakingNews,
         });
         news = await news.save();
+        console.log('news', news);
 
         if (!news) {
             return res.status(500).json({ error: 'news creation failed' });
