@@ -2,12 +2,22 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 const path = require('path');
+const cors = require('cors');
+
+// cors
+
+var corsOptions = {
+    origin: ['https://eclipse-news.netlify.app/', 'http://localhost:4200/'], // ONLY allow your Netlify domain
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Specify allowed methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
+    credentials: true, // If your frontend sends cookies or authorization headers, set this to true
+};
 
 //middlewares
 
 app.use(express.json());
 app.use('/public/uploads', express.static(path.join('public/uploads')));
-
+app.use(cors(corsOptions));
 //routes
 
 const categoryRoutes = require('./routes/category');
