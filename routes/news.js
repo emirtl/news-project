@@ -41,8 +41,8 @@ router.get('/get/:id', controller.get);
 
 router.post(
     '/insert',
-    isAuthenticatedUser,
-    isAdmin,
+    // isAuthenticatedUser,
+    // isAdmin,
     multer({ storage }).single('image'),
     controller.insert
 );

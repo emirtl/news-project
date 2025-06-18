@@ -86,6 +86,8 @@ exports.get = async (req, res) => {
 };
 
 exports.insert = async (req, res) => {
+    console.log('req.body', req.body);
+
     try {
         if (
             !req.body.title ||
@@ -109,28 +111,30 @@ exports.insert = async (req, res) => {
         //     });
         // }
 
-        if (req.file.image) {
+        if (req.file) {
             const imagePath = `${req.protocol}://${req.get(
                 'host'
             )}/public/uploads/${req.file.filename}`;
             newImagePath = imagePath;
+        } else {
+            newImagePath = '';
         }
 
-        if (req.files.coverImage) {
-            req.files.coverImage.map((file) => {
-                const imagePath = `${req.protocol}://${req.get(
-                    'host'
-                )}/public/uploads/${file.filename}`;
-                coverImagePath = imagePath;
-            });
-        }
+        // if (req.files.coverImage) {
+        //     req.files.coverImage.map((file) => {
+        //         const imagePath = `${req.protocol}://${req.get(
+        //             'host'
+        //         )}/public/uploads/${file.filename}`;
+        //         coverImagePath = imagePath;
+        //     });
+        // }
+        console.log('newImagePath', newImagePath);
 
         let news = new News({
             title: req.body.title,
             description: req.body.description,
             richDescription: req.body.richDescription,
             image: newImagePath,
-            coverImage: coverImagePath,
             author: req.body.author,
             category: req.body.category,
             isFeatured: req.body.isFeatured,
